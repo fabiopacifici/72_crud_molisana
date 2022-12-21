@@ -54,7 +54,8 @@ class ProductController extends Controller
         $product->save();
 
         // redirect to a get route!?
-        return to_route('products.index');
+        // return redirect()->route('products.index');
+        return to_route('products.index')->with('message', "$product->title added successfully");
     }
 
     /**
@@ -77,7 +78,7 @@ class ProductController extends Controller
      */
     public function edit(Product $product)
     {
-        //
+        return view('admin.products.edit', compact('product'));
     }
 
     /**
@@ -89,7 +90,22 @@ class ProductController extends Controller
      */
     public function update(UpdateProductRequest $request, Product $product)
     {
-        //
+        //dd($request->all(), $product);
+        $data = [
+            'title' => $request['title'],
+            'src' => $request['src'],
+            'description' => $request['description'],
+            'type' => $request['type'],
+            'weight' => $request['weight'],
+            'cooking_time' => $request['cooking_time'],
+
+        ];
+
+        $product->update($data);
+
+        // return redirect()->route('products.index');
+        return to_route('products.index')->with('message', "$product->title update successfully");
+
     }
 
     /**
@@ -100,6 +116,9 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        //
+        $product->delete();
+
+        // return redirect()->route('products.index');
+        return to_route('products.index')->with('message', "$product->title deleted successfully");
     }
 }
