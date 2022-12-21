@@ -1,45 +1,17 @@
-# CRUD Parte 1
+@extends('layouts.app')
 
-What we need
+@section('content')
 
-- Model (Post)
-- Resource Controller (PostController)
-- Migration create_posts_table
-- Seeder PostSeeder
+<section class="posts py-5">
+    <div class="container">
+        <div class="heading d-flex justify-content-between">
+            <h2>Posts</h2>
+            <div>
+                <a href="{{route('posts.create')}}" class="btn btn-primary">Add Post</a>
+            </div>
+        </div>
 
-## Generate files
-
-```php
-
-php artisan make:model -a Post
-
-```
-
-## CRUD - Index (show all resources - posts)
-
-Define the route
-
-```php
-Route::get('admin/posts', [PostController::class, 'index'])->name('posts.index');
-```
-
-Implement the index method
-
-```php
-public function index()
-    {
-        //dd(Post::all());
-        $posts = Post::orderByDesc('id')->get();
-        return view('admin.posts.index', compact('posts'));
-    }
-
-```
-
-Create the view
-
-```php
-
-       <div class="table-responsive-md">
+        <div class="table-responsive-md">
             <table class="table table-striped
             table-hover
             table-borderless
@@ -93,130 +65,8 @@ Create the view
             </table>
         </div>
 
-
-```
-
-## CRUD - Show (show single post)
-
-route
-
-```php
-Route::get('admin/posts/{post}', [PostController::class, 'show'])->name('posts.show');
-
-```
-
-method
-
-```php
- public function show(Product $product)
-    {
-        //
-        return view('admin.products.show', compact('product'));
-    }
-```
-
-markup (no loops here)
-
-```php
-<div class="container py-5">
-    <div class="d-flex gap-4">
-        <img src="{{$post->cover}}" alt="{{$post->title}}">
-        <div class="details">
-            <h1>{{$post->title}}</h1>
-            <p>{{$post->content}}</p>
-        </div>
     </div>
-</div>
 
-```
+</section>
 
-## CRUD - Create (show a form)
-
-Route
-
-```php
-Route::get('admin/posts/create', [PostController::class, 'create'])->name('posts.create');
-
-```
-
-metodo nel controller
-
-```php
- /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        return view('admin.posts.create');
-    }
-
-```
-
-Markup
-
-```php
-<form action="{{route('posts.store')}}" method="post" class="card p-3">
-        @csrf
-
-        <div class="mb-3">
-            <label for="title" class="form-label">Title</label>
-            <input type="text" name="title" id="title" class="form-control" placeholder="la pasta piú buona" aria-describedby="titleHlper">
-            <small id="titleHlper" class="text-muted">Add the post title here</small>
-        </div>
-        <div class="mb-3">
-            <label for="cover" class="form-label">Product Image</label>
-            <input type="text" name="cover" id="cover" class="form-control" placeholder="Linguine corte" aria-describedby="coverHlper">
-            <small id="coverHlper" class="text-muted">Add the product cover here</small>
-        </div>
-
-        <div class="mb-3">
-            <label for="content" class="form-label">Content</label>
-            <textarea class="form-control" name="content" id="content" rows="4"></textarea>
-        </div>
-
-        <button type="submit" class="btn btn-primary">Submit</button>
-
-    </form>
-```
-
-## CRUD - Store (save the post)
-
-route
-
-```php
-Route::post('admin/posts', [PostController::class, 'store'])->name('posts.store');
-
-```
-
-method
-
-```php
-public function store(StorePostRequest $request)
-    {
-        //dd($request->all());
-
-        // VALIDATE ALL DATA
-
-        // SAVE
-        $data = [
-            'title' => $request['title'],
-            'cover' => $request['cover'],
-            'content' => $request['content'],
-        ];
-        //dd($data);
-        Post::create($data);
-        //REDIRECT
-        return redirect()->route('posts.index');
-    }
-```
-
-NOTA: Ricorda di settare su true il valore di authorze dentro la form request StorePostRequest
-
-```php
-    public function authorize()
-    {
-        return true;
-    }
-```
+@endsection
