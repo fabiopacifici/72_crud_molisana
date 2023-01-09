@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-//use Illuminate\Http\Request;
+use Illuminate\Http\Request;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
-
+use Illuminate\Support\Facades\Validator;
 class ProductController extends Controller
 {
     /**
@@ -36,22 +36,34 @@ class ProductController extends Controller
      * @param  \App\Http\Requests\StoreProductRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreProductRequest $request)
+    public function store(Request $request)
     {
         //dd($request->all());
         //dd($request['title']);
 
         //TODO: validata all request data
+        /*   $val_data = $request->validate([
+            'title' => 'required|min:5|max:100',
+            'src' => 'nullable|max:255',
+            'description' => 'nullable',
+            'type' => 'nullable|max:20',
+            'cooking_time' => 'nullable|max:10',
+            'weight' => 'nullable|max:10'
+        ]);
+ */
+        $val_data = $this->validation($request->all());
 
+        //dd($val_data);
         // Save all data
-        $product = new Product();
+        $product = Product::create($val_data);
+        /*$product = new Product();
         $product->title = $request['title'];
         $product->src = $request['src'];
         $product->description = $request['description'];
         $product->weight = $request['weight'];
         $product->type = $request['type'];
         $product->cooking_time = $request['cooking_time'];
-        $product->save();
+        $product->save(); */
 
         // redirect to a get route!?
         // return redirect()->route('products.index');
@@ -88,10 +100,18 @@ class ProductController extends Controller
      * @param  \App\Models\Product  $product
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateProductRequest $request, Product $product)
+    public function update(Request $request, Product $product)
     {
         //dd($request->all(), $product);
-        $data = [
+        $val_data = $request->validate([
+            'title' => 'required|min:5|max:100',
+            'src' => 'nullable|max:255',
+            'description' => 'nullable',
+            'type' => 'nullable|max:20',
+            'cooking_time' => 'nullable|max:10',
+            'weight' => 'nullable|max:10'
+        ]);
+        /*  $data = [
             'title' => $request['title'],
             'src' => $request['src'],
             'description' => $request['description'],
@@ -99,9 +119,9 @@ class ProductController extends Controller
             'weight' => $request['weight'],
             'cooking_time' => $request['cooking_time'],
 
-        ];
+        ]; */
 
-        $product->update($data);
+        $product->update($val_data);
 
         // return redirect()->route('products.index');
         return to_route('products.index')->with('message', "$product->title update successfully");
@@ -121,4 +141,25 @@ class ProductController extends Controller
         // return redirect()->route('products.index');
         return to_route('products.index')->with('message', "$product->title deleted successfully");
     }
+
+    private function validation($data)
+    {
+        // Validator::make($data, $rules, $message)
+        $validator = Validator::make($data, [
+            'title' => 'required|min:5|max:100',
+            'src' => 'nullable|max:255',
+            'description' => 'nullable',
+            'type' => 'nullable|max:20',
+            'cooking_time' => 'nullable|max:10',
+            'weight' => 'nullable|max:10'
+        ], [
+            'title.required' => 'Il titolo é obbligatorio',
+            'title.min' => 'Il titolo deve essere almeno :min caratteri',
+            'title.max' => 'Il titolo deve essere almeno :min caratteri'
+
+        ])->validate();
+
+        return $validator;
+    }
+
 }
